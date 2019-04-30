@@ -1,0 +1,43 @@
+version: '2'
+services:
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DOCKER_MONGODB_HOST: "mongo"
+      DOCKER_REDIS_HOST: "redis"
+      JWT_ACCESS_CODE: "F42EEF514E67DC5FF17E8F0B60BF18B31F0E64ED6A46067855104033A82BC241"
+    depends_on:
+      - mongo
+      - redis
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+  nginx:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+  # haproxy:
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfile.haproxy
+  #   ports:
+  #     - "80:80"
+  #   depends_on:
+  #     - frontend
+  #     - backend
